@@ -3,9 +3,9 @@
 # ============================================
 
 import pygame
-from config import ANCHO, ALTO, FPS
-from pantallas import PantallaRegistro, PantallaInicio, PantallaJuego, PantallaFinal
-from puntuaciones import SistemaPuntuaciones
+from src.config import ANCHO, ALTO, FPS
+from src.pantallas import PantallaRegistro, PantallaInicio, PantallaJuego, PantallaFinal
+from src.puntuaciones import SistemaPuntuaciones
 
 # Función principal que ejecuta el juego
 def main():

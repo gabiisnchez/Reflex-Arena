@@ -3,9 +3,9 @@
 # ============================================
 
 import pygame
-from config import *
-from circulo import Circulo
-from ui import dibujar_texto, dibujar_boton, dibujar_input_box
+from src.config import *
+from src.circulo import Circulo
+from src.ui import dibujar_texto, dibujar_boton, dibujar_input_box
 
 # Pantalla donde el jugador introduce su nombre y curso
 class PantallaRegistro:

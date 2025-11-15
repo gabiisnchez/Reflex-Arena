@@ -5,7 +5,7 @@
 import random       # Para generar número aleatorios
 import math         # Para operaciones matemáticas
 import pygame
-from config import COLORES_CIRCULOS, BLANCO, VELOCIDAD_MIN, VELOCIDAD_MAX
+from src.config import COLORES_CIRCULOS, BLANCO, VELOCIDAD_MIN, VELOCIDAD_MAX
 
 class Circulo:
     """
@@ -63,12 +63,12 @@ class Circulo:
     # Dibuja el círculo en la pantalla con su número de puntos
     def dibujar(self, superficie, fuente):
 
-        # Dibujar círculo relleno
-        pygame.draw.circle(superficie, self.color, (int)(self.x), (int)(self.y), self.radio)
-
+        # Dibujar círculo relleno - NOTA: el centro debe ser una tupla (x, y)
+        pygame.draw.circle(superficie, self.color, (int(self.x), int(self.y)), self.radio)
+    
         # Dibujar borde blanco
-        pygame.draw.circle(superficie, BLANCO, (int)(self.x), (int)(self.y), self.radio, 3)
-
+        pygame.draw.circle(superficie, BLANCO, (int(self.x), int(self.y)), self.radio, 3)
+        
         # Dibujar número de puntos en el centro
         texto_puntos = fuente.render(str(self.puntos), True, BLANCO)
         rect = texto_puntos.get_rect(center=(int(self.x), int(self.y)))

@@ -3,7 +3,7 @@
 # ============================================
 
 import pygame
-from config import NEGRO, BLANCO, AMARILLO, GRIS_CLARO
+from src.config import NEGRO, BLANCO, AMARILLO, GRIS_CLARO
 
 
 # Dibuja texto en pantalla
