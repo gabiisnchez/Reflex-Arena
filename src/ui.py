@@ -5,6 +5,7 @@
 import pygame
 from config import NEGRO, BLANCO, AMARILLO, GRIS_CLARO
 
+
 # Dibuja texto en pantalla
 def dibujar_texto(pantalla, texto, fuente, color, x, y, centro=False):
 
@@ -18,6 +19,7 @@ def dibujar_texto(pantalla, texto, fuente, color, x, y, centro=False):
     else:
         # Si no, lo dibujamos desde la esquina superior izquierda
         pantalla.blit(superficie_texto, (x, y))
+
 
 # Dibuja un botón interactivo que cambia al pasar el mouse
 def dibujar_boton(pantalla, boton, texto, fuente, color_fondo, mouse_pos):
@@ -36,6 +38,7 @@ def dibujar_boton(pantalla, boton, texto, fuente, color_fondo, mouse_pos):
         dibujar_texto(pantalla, texto, fuente, BLANCO, boton.centerx, boton.centery, True)
 
     return hover
+
 
 # Dibuja una caja de texto donde el usuario puede escribir
 def dibujar_input_box(pantalla, rect, texto, activo, fuente, max_chars=None):
