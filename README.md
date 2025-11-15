@@ -1,4 +1,4 @@
-# ⚡ ReflexArena
+# ⚡ Reflex Arena
 
 <div align="center">
 
