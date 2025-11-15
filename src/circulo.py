@@ -15,8 +15,9 @@ class Circulo:
     Se mueve rebotando en los bordes y puede detectar si fue clickeado.
     """
 
+
+    # Constructor que inicializar un círculo con valores aleatorios
     def __init__(self, ancho, alto):
-        # Constructor que inicializar un círculo con valores aleatorios
 
         # Guardar dimensiones de la pantalla
         self.ancho = ancho
@@ -42,8 +43,9 @@ class Circulo:
         # Calcular puntos según tamaño (más pequeño = más puntos)
         self.puntos = max(1, 6 - (self.radio // 10))
 
+
+    # Mueve el círculo según su velocidad y lo hace rebotar en los bordes
     def mover(self):
-        # Mueve el círculo según su velocidad y lo hace rebotar en los bordes
 
         # Actualizar posición
         self.x += self.velocidad_x
@@ -57,8 +59,9 @@ class Circulo:
         if self.y - self.radio <= 100 or self.y + self.radio >= self.alto:
             self.velocidad_y *= -1 # Invertir dirección Y
 
+
+    # Dibuja el círculo en la pantalla con su número de puntos
     def dibujar(self, superficie, fuente):
-        # Dibuja el círculo en la pantalla con su número de puntos
 
         # Dibujar círculo relleno
         pygame.draw.circle(superficie, self.color, (int)(self.x), (int)(self.y), self.radio)
@@ -71,8 +74,9 @@ class Circulo:
         rect = texto_puntos.get_rect(center=(int(self.x), int(self.y)))
         superficie.blit(texto_puntos, rect)
 
+
+    # Verifica si se hizo clic dentro del círculo
     def clicked(self, pos_x, pos_y):
-        # Verifica si se hizo clic dentro del círculo
 
         # Calcular distancia entre el clic y el centro del círculo
         distancia = math.sqrt((self.x -pos_x)**2 + (self.y - pos_y)**2)
