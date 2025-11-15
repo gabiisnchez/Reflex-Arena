@@ -9,7 +9,7 @@
 
 **Juego arcade de reflejos y precisión desarrollado en Python con Pygame**
 
-*Creado para las Jornadas de Puertas Abiertas - Instituto 2025*
+*Creado para el Interciclo - MEDAC Sevilla Este 2025*
 
 [Características](#-características) •
 [Instalación](#-instalación) •
