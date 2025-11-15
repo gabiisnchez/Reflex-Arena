@@ -110,15 +110,17 @@ python main.py
 ## 📁 Estructura del Proyecto
 ```
 Reflex-Arena/
-│
-├── config.py              # Configuración global y constantes
-├── puntuaciones.py        # Sistema de gestión de puntuaciones
-├── circulo.py             # Lógica de los círculos (movimiento, colisión)
-├── ui.py                  # Funciones de interfaz (textos, botones, inputs)
-├── pantallas.py           # Clases de todas las pantallas del juego
-├── main.py                # Punto de entrada principal
-├── puntuaciones.json      # Datos de puntuaciones (se crea automáticamente)
-└── README.md              # Este archivo
+├── sfx/                      # Efectos de sonido (audio: .wav, .ogg, etc.)
+├── src/
+│   ├── circulo.py            # Lógica de los círculos
+│   ├── config.py             # Configuración global y constantes
+│   ├── pantallas.py          # Clases de todas las pantallas del juego
+│   ├── puntuaciones.py       # Sistema de gestión de puntuaciones
+│   ├── ui.py                 # Funciones de interfaz
+│   └── main.py               # Punto de entrada principal
+├── puntuaciones.json         # Datos de puntuaciones (se crea/actualiza automáticamente)
+└── README.md                 # Documentación del proyecto (este archivo)
+
 ```
 
 ### Descripción de Módulos
