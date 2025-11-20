@@ -152,6 +152,7 @@ class PantallaJuego:
         self.circulos = [Circulo(ANCHO, ALTO) for _ in range(NUM_CIRCULOS)]
         self.puntuacion = 0
         self.clicks_fallados = 0
+        self.racha = 0
         self.tiempo_inicio = pygame.time.get_ticks()
         self.tictac_sonando = False
         
@@ -178,7 +179,14 @@ class PantallaJuego:
         
         for circulo in self.circulos[:]:
             if circulo.clicked(click_x, click_y):
-                self.puntuacion += circulo.puntos
+                self.racha += 1
+                bonus = 0
+                if self.racha >= 10:
+                    bonus = 2
+                elif self.racha >= 5:
+                    bonus = 1
+                
+                self.puntuacion += circulo.puntos + bonus
                 self.circulos.remove(circulo)
                 self.circulos.append(Circulo(ANCHO, ALTO))
                 circulo_clickeado = True
@@ -186,6 +194,7 @@ class PantallaJuego:
                 break
         
         if not circulo_clickeado:
+            self.racha = 0
             self.clicks_fallados += 1
             self.puntuacion = max(0, self.puntuacion - 1)
             self.gestor_sonidos.reproducir_sonido("fail")
@@ -208,6 +217,16 @@ class PantallaJuego:
         
         dibujar_texto(self.pantalla, f"PUNTOS: {self.puntuacion}", 
                         self.fuentes['mediana'], AMARILLO, 20, 30)
+
+        if self.racha > 1:
+            color_racha = BLANCO
+            if self.racha >= 10:
+                color_racha = ROJO
+            elif self.racha >= 5:
+                color_racha = AMARILLO
+            
+            dibujar_texto(self.pantalla, f"COMBO x{self.racha}", 
+                            self.fuentes['mediana'], color_racha, 20, 70)
         
         color_tiempo = VERDE if tiempo_restante > 10 else (AMARILLO if tiempo_restante > 5 else ROJO)
         dibujar_texto(self.pantalla, f"TIEMPO: {int(tiempo_restante)}s", 
