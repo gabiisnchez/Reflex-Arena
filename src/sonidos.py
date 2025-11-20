@@ -46,7 +46,7 @@ class GestorSonidos:
                 self.sonidos[nombre] = None
 
     # Reproduce un sonido
-    def reproducir(self, nombre):
+    def reproducir_sonido(self, nombre):
         if nombre in self.sonidos and self.sonidos[nombre] is not None:
             self.sonidos[nombre].play()
 

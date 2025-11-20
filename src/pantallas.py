@@ -144,14 +144,16 @@ class PantallaInicio:
 class PantallaJuego:
     
     # Constructor de la pantalla de juego
-    def __init__(self, pantalla, fuentes):
+    def __init__(self, pantalla, fuentes, gestor_sonidos):
 
         self.pantalla = pantalla
         self.fuentes = fuentes
+        self.gestor_sonidos = gestor_sonidos
         self.circulos = [Circulo(ANCHO, ALTO) for _ in range(NUM_CIRCULOS)]
         self.puntuacion = 0
         self.clicks_fallados = 0
         self.tiempo_inicio = pygame.time.get_ticks()
+        self.tictac_sonando = False
         
 
     # Actualiza el tiempo del juego
@@ -160,6 +162,11 @@ class PantallaJuego:
         tiempo_actual = pygame.time.get_ticks()
         tiempo_transcurrido = (tiempo_actual - self.tiempo_inicio) / 1000
         tiempo_restante = max(0, TIEMPO_JUEGO - tiempo_transcurrido)
+
+        if tiempo_restante <= 5 and tiempo_restante > 0 and not self.tictac_sonando:
+            self.gestor_sonidos.reproducir_sonido("tictac")
+            self.tictac_sonando = True
+        
         return tiempo_restante
     
 
@@ -175,11 +182,13 @@ class PantallaJuego:
                 self.circulos.remove(circulo)
                 self.circulos.append(Circulo(ANCHO, ALTO))
                 circulo_clickeado = True
+                self.gestor_sonidos.reproducir_sonido("click")
                 break
         
         if not circulo_clickeado:
             self.clicks_fallados += 1
             self.puntuacion = max(0, self.puntuacion - 1)
+            self.gestor_sonidos.reproducir_sonido("fail")
     
 
     # Mueve todos los círculos
@@ -212,7 +221,7 @@ class PantallaJuego:
 class PantallaFinal:
 
     # Constructor de la pantalla final    
-    def __init__(self, pantalla, fuentes, jugador, puntuacion, clicks_fallados, sistema_puntuaciones):
+    def __init__(self, pantalla, fuentes, jugador, puntuacion, clicks_fallados, sistema_puntuaciones, gestor_sonidos):
 
         self.pantalla = pantalla
         self.fuentes = fuentes
@@ -220,6 +229,7 @@ class PantallaFinal:
         self.puntuacion = puntuacion
         self.clicks_fallados = clicks_fallados
         self.sistema = sistema_puntuaciones
+        self.gestor_sonidos = gestor_sonidos
         
         self.sistema.agregar_puntuacion(
             jugador["nombre"], jugador["curso"], puntuacion, clicks_fallados
@@ -227,6 +237,9 @@ class PantallaFinal:
         
         self.posicion = self.sistema.obtener_posicion(puntuacion)
         self.top10 = self.sistema.obtener_top10()
+
+        if self.posicion == 1:
+            self.gestor_sonidos.reproducir_sonido("record")
         
     # Muestra la pantalla final con resultados
     def mostrar(self):

@@ -6,6 +6,7 @@ import pygame
 from src.config import ANCHO, ALTO, FPS
 from src.pantallas import PantallaRegistro, PantallaInicio, PantallaJuego, PantallaFinal
 from src.puntuaciones import SistemaPuntuaciones
+from src.sonidos import GestorSonidos
 
 # Función principal que ejecuta el juego
 def main():
@@ -29,6 +30,9 @@ def main():
     
     # Inicializar sistema de puntuaciones
     sistema_puntuaciones = SistemaPuntuaciones()
+
+    # Inicializar sistema de sonidos
+    gestor_sonidos = GestorSonidos()
     
     # Registro inicial del jugador
     pantalla_registro = PantallaRegistro(pantalla, fuentes)
@@ -49,7 +53,7 @@ def main():
             break
         
         # Juego
-        pantalla_juego = PantallaJuego(pantalla, fuentes)
+        pantalla_juego = PantallaJuego(pantalla, fuentes, gestor_sonidos)
         ejecutando = True
         
         while ejecutando:
@@ -77,7 +81,8 @@ def main():
             pantalla, fuentes, jugador, 
             pantalla_juego.puntuacion, 
             pantalla_juego.clicks_fallados,
-            sistema_puntuaciones
+            sistema_puntuaciones,
+            gestor_sonidos
         )
         
         if not pantalla_final.mostrar():
