@@ -76,6 +76,9 @@ def main():
             pantalla_juego.dibujar(tiempo_restante)
             pygame.display.flip()
         
+        # Detener sonido de tictac al terminar
+        gestor_sonidos.detener_sonido("tictac")
+
         # Pantalla final con ranking
         pantalla_final = PantallaFinal(
             pantalla, fuentes, jugador, 

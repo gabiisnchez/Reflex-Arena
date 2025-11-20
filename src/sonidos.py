@@ -17,11 +17,11 @@ class GestorSonidos:
         # Diccionario para los sonidos
         self.sonidos = {}
 
-        # Cargar los sonidos
-        self.cargar_sonidos()
-
         # Volumen general de los sonidos
         self.volumen = 0.5
+
+        # Cargar los sonidos
+        self.cargar_sonidos()
 
     # Carga los 4 archivos de sonido
     def cargar_sonidos(self):
@@ -49,6 +49,11 @@ class GestorSonidos:
     def reproducir_sonido(self, nombre):
         if nombre in self.sonidos and self.sonidos[nombre] is not None:
             self.sonidos[nombre].play()
+
+    # Detiene un sonido
+    def detener_sonido(self, nombre):
+        if nombre in self.sonidos and self.sonidos[nombre] is not None:
+            self.sonidos[nombre].stop()
 
     # Ajusta el volumen (0.0 a 1.0)
     def set_volumen(self, volumen):
