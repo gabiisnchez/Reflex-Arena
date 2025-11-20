@@ -16,12 +16,38 @@ class PantallaRegistro:
         self.pantalla = pantalla
         self.fuentes = fuentes
         self.nombre = ""
-        self.curso = ""
         self.input_activo = "nombre"
         
         self.input_nombre = pygame.Rect(ANCHO//2 - 200, 250, 400, 50)
-        self.input_curso = pygame.Rect(ANCHO//2 - 200, 350, 400, 50)
         self.boton_continuar = pygame.Rect(ANCHO//2 - 150, 470, 300, 50)
+        
+        # Inicializar Dropdown
+        from src.ui import Dropdown
+        opciones_curso = ["1º Acondicionamiento Físico","2º Acondicionamiento Físico", 
+                            "1º TSEAS", "2º TSEAS", 
+                            "1º TECO", "2º TECO", 
+                            "1º DAM", "2º DAM", 
+                            "1º DAW", "2º DAW", 
+                            "1º SMR", "2º SMR",
+                            "1º Anatomía Patológica", "2º Anatomía Patológica",
+                            "1º Enfermería", "2º Enfermería",
+                            "1º Dietética", "2º Dietética",
+                            "1º Farmacia", "2º Farmacia",
+                            "1º Higiene", "2º Higiene",
+                            "1º Imagen", "2º Imagen",
+                            "1º Laboratorio", "2º Laboratorio",
+                            "1º Prótesis", "2º Prótesis",
+                            "1º Atención a personas", "2º Atención a personas", 
+                            "1º Infantil", "2º Infantil",
+                            "1º Integración Social", "2º Integración Social"]
+        self.dropdown_curso = Dropdown(
+            ANCHO//2 - 200, 350, 400, 50, 
+            fuentes['mediana'], 
+            GRIS_CLARO, 
+            AMARILLO, 
+            BLANCO, 
+            opciones_curso
+        )
         
 
     # Muestra la pantalla de registro y gestiona la entrada de datos
@@ -38,17 +64,19 @@ class PantallaRegistro:
             
             dibujar_texto(self.pantalla, "Nombre:", 
                             self.fuentes['mediana'], BLANCO, ANCHO//2 - 200, 210)
-            dibujar_texto(self.pantalla, "Curso (ej: 1º ESO, 2º BACH):", 
+            dibujar_texto(self.pantalla, "Curso:", 
                             self.fuentes['mediana'], BLANCO, ANCHO//2 - 200, 310)
             
             dibujar_input_box(self.pantalla, self.input_nombre, self.nombre, 
                             self.input_activo == "nombre", self.fuentes['mediana'])
-            dibujar_input_box(self.pantalla, self.input_curso, self.curso, 
-                            self.input_activo == "curso", self.fuentes['mediana'])
+            
+            # Dibujar Dropdown
+            self.dropdown_curso.dibujar(self.pantalla)
             
             mouse_pos = pygame.mouse.get_pos()
             
-            puede_continuar = len(self.nombre.strip()) > 0 and len(self.curso.strip()) > 0
+            curso_seleccionado = self.dropdown_curso.obtener_valor()
+            puede_continuar = len(self.nombre.strip()) > 0 and curso_seleccionado is not None
             color_boton = VERDE if puede_continuar else GRIS
             
             if puede_continuar:
@@ -65,36 +93,33 @@ class PantallaRegistro:
                 if evento.type == pygame.QUIT:
                     return None
                 
+                # Manejar eventos del dropdown
+                if self.dropdown_curso.manejar_evento(evento):
+                    pass # El dropdown manejó el evento
+                
                 if evento.type == pygame.MOUSEBUTTONDOWN:
                     if self.input_nombre.collidepoint(evento.pos):
                         self.input_activo = "nombre"
-                    elif self.input_curso.collidepoint(evento.pos):
-                        self.input_activo = "curso"
                     elif self.boton_continuar.collidepoint(evento.pos) and puede_continuar:
-                        return {"nombre": self.nombre.strip(), "curso": self.curso.strip()}
+                        return {"nombre": self.nombre.strip(), "curso": curso_seleccionado}
                 
                 if evento.type == pygame.KEYDOWN:
                     if evento.key == pygame.K_BACKSPACE:
                         if self.input_activo == "nombre":
                             self.nombre = self.nombre[:-1]
-                        else:
-                            self.curso = self.curso[:-1]
                     elif evento.key == pygame.K_TAB:
-                        self.input_activo = "curso" if self.input_activo == "nombre" else "nombre"
+                        self.input_activo = "nombre"
                     elif evento.key == pygame.K_RETURN and puede_continuar:
-                        return {"nombre": self.nombre.strip(), "curso": self.curso.strip()}
+                        return {"nombre": self.nombre.strip(), "curso": curso_seleccionado}
                     else:
                         if self.input_activo == "nombre" and len(self.nombre) < 20:
                             self.nombre += evento.unicode
-                        elif self.input_activo == "curso" and len(self.curso) < 15:
-                            self.curso += evento.unicode
             
             pygame.display.flip()
 
 
 # Pantalla de inicio con información del juego y botón para empezar
 class PantallaInicio:
-    """"""
     
     def __init__(self, pantalla, fuentes):
         """Constructor de la pantalla de inicio."""
