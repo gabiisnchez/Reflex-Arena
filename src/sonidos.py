@@ -32,7 +32,8 @@ class GestorSonidos:
             "click": "click.mp3",
             "fail": "fail.mp3",
             "tictac": "tictac.mp3",
-            "record": "record.mp3"
+            "record": "record.mp3",
+            "bonus": "bonus.mp3"
         }
 
         for nombre, archivo in archivos.items():

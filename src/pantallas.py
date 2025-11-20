@@ -186,6 +186,9 @@ class PantallaJuego:
                 elif self.racha >= 5:
                     bonus = 1
                 
+                if self.racha == 5 or self.racha == 10:
+                    self.gestor_sonidos.reproducir_sonido("bonus")
+                
                 self.puntuacion += circulo.puntos + bonus
                 self.circulos.remove(circulo)
                 self.circulos.append(Circulo(ANCHO, ALTO))
@@ -209,6 +212,7 @@ class PantallaJuego:
 
     # Dibuja el estado actual del juego
     def dibujar(self, tiempo_restante):
+            
 
         self.pantalla.fill(NEGRO)
         
