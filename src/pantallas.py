@@ -344,22 +344,22 @@ class PantallaFinal:
                 y_pos += 30
             
             boton_reintentar = pygame.Rect(50, 540, 300, 45)
-            boton_salir = pygame.Rect(450, 540, 300, 45)
+            boton_nuevo_juego = pygame.Rect(450, 540, 300, 45)
             
             mouse_pos = pygame.mouse.get_pos()
             
             dibujar_boton(self.pantalla, boton_reintentar, "JUGAR DE NUEVO", 
                             self.fuentes['pequeña'], VERDE, mouse_pos)
-            dibujar_boton(self.pantalla, boton_salir, "SALIR", 
-                            self.fuentes['pequeña'], ROJO, mouse_pos)
+            dibujar_boton(self.pantalla, boton_nuevo_juego, "NUEVO JUEGO", 
+                            self.fuentes['pequeña'], AZUL, mouse_pos)
             
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
-                    return False
+                    return None
                 if evento.type == pygame.MOUSEBUTTONDOWN:
                     if boton_reintentar.collidepoint(evento.pos):
-                        return True
-                    elif boton_salir.collidepoint(evento.pos):
-                        return False
+                        return "replay"
+                    elif boton_nuevo_juego.collidepoint(evento.pos):
+                        return "new_user"
             
             pygame.display.flip()
