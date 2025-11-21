@@ -37,18 +37,36 @@ class SistemaPuntuaciones:
             print(f"Error al guardar puntuaciones: {e}")
     
 
-    # Agrega una nueva puntuación al sistema
+    # Agrega una nueva puntuación al sistema o actualiza si es mejor
     def agregar_puntuacion(self, nombre, curso, puntuacion, clicks_fallados):
-        nueva_puntuacion = {
-            "nombre": nombre,
-            "curso": curso,
-            "puntuacion": puntuacion,
-            "clicks_fallados": clicks_fallados,
-            "fecha": datetime.now().strftime("%d/%m/%Y %H:%M")
-        }
-        self.puntuaciones.append(nueva_puntuacion)
-        self.puntuaciones.sort(key=lambda x: x["puntuacion"], reverse=True)
-        self.guardar_puntuaciones()
+        # Buscar si el usuario ya existe
+        usuario_existente = None
+        for p in self.puntuaciones:
+            if p["nombre"] == nombre and p["curso"] == curso:
+                usuario_existente = p
+                break
+        
+        if usuario_existente:
+            # Si existe, solo actualizamos si la nueva puntuación es mejor
+            if puntuacion > usuario_existente["puntuacion"]:
+                usuario_existente["puntuacion"] = puntuacion
+                usuario_existente["clicks_fallados"] = clicks_fallados
+                usuario_existente["fecha"] = datetime.now().strftime("%d/%m/%Y %H:%M")
+                # Reordenamos la lista
+                self.puntuaciones.sort(key=lambda x: x["puntuacion"], reverse=True)
+                self.guardar_puntuaciones()
+        else:
+            # Si no existe, lo agregamos como nuevo
+            nueva_puntuacion = {
+                "nombre": nombre,
+                "curso": curso,
+                "puntuacion": puntuacion,
+                "clicks_fallados": clicks_fallados,
+                "fecha": datetime.now().strftime("%d/%m/%Y %H:%M")
+            }
+            self.puntuaciones.append(nueva_puntuacion)
+            self.puntuaciones.sort(key=lambda x: x["puntuacion"], reverse=True)
+            self.guardar_puntuaciones()
 
 
     # Obtiene la posición de una puntuación en el ranking
