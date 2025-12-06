@@ -232,8 +232,12 @@ class PantallaJuego:
 
     # Mueve todos los círculos
     def mover_circulos(self):
-        for circulo in self.circulos:
+        for circulo in self.circulos[:]:
             circulo.mover()
+            # Si el círculo expira (solo dorados por ahora), lo eliminamos y creamos uno nuevo
+            if circulo.ha_expirado():
+                self.circulos.remove(circulo)
+                self.circulos.append(Circulo(ANCHO, ALTO))
 
     # Dibuja el estado actual del juego
     def dibujar(self, tiempo_restante):
