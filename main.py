@@ -16,43 +16,38 @@ def main():
     
     # Crear ventana
     pantalla = pygame.display.set_mode((ANCHO, ALTO))
-    pygame.display.set_caption("⚡ REFLEJOS RÁPIDOS ⚡")
+    pygame.display.set_caption("Reflex-Arena")
     
-    # Crear diccionario de fuentes
+    # Intentar cargar fuente de Emojis de Windows explícitamente
+    # Primero buscamos el path
+    font_path = pygame.font.match_font('segoeuiemoji')
+    
+    # Si no lo encuentra por nombre, intentamos una ruta común (Windows)
+    if not font_path:
+         import os
+         possible_path = r"C:\Windows\Fonts\seguiemj.ttf"
+         if os.path.exists(possible_path):
+             font_path = possible_path
+
+    print(f"DEBUG: Fuente emoji encontrada en: {font_path}")
+
+    # Definir función helper para cargar
+    def cargar_fuente(size):
+        if font_path:
+            try:
+                f = pygame.font.Font(font_path, size)
+                return f
+            except Exception as e:
+                print(f"DEBUG: Error cargando fuente {font_path}: {e}")
+        # Fallback
+        print("DEBUG: Usando Arial como fallback")
+        return pygame.font.SysFont("arial", size)
+
     fuentes = {
         'grande': pygame.font.Font(None, 74),
         'mediana': pygame.font.Font(None, 48),
-        'pequeña': pygame.font.Font(None, 36)
-    }
-    
-    # Reloj para controlar FPS
-    reloj = pygame.time.Clock()
-    
-# ============================================
-# main.py - Archivo principal
-# ============================================
-
-import pygame
-from src.config import ANCHO, ALTO, FPS
-from src.pantallas import PantallaRegistro, PantallaInicio, PantallaJuego, PantallaFinal
-from src.puntuaciones import SistemaPuntuaciones
-from src.sonidos import GestorSonidos
-
-# Función principal que ejecuta el juego
-def main():
-
-    # Inicializar Pygame
-    pygame.init()
-    
-    # Crear ventana
-    pantalla = pygame.display.set_mode((ANCHO, ALTO))
-    pygame.display.set_caption("⚡ REFLEJOS RÁPIDOS ⚡")
-    
-    # Crear diccionario de fuentes
-    fuentes = {
-        'grande': pygame.font.Font(None, 74),
-        'mediana': pygame.font.Font(None, 48),
-        'pequeña': pygame.font.Font(None, 36)
+        'pequeña': pygame.font.Font(None, 36),
+        'emoji_pequeña': cargar_fuente(36)
     }
     
     # Reloj para controlar FPS

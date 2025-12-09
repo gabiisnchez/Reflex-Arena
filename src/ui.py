@@ -3,66 +3,93 @@
 # ============================================
 
 import pygame
-from src.config import NEGRO, BLANCO, AMARILLO, GRIS_CLARO
+from src.config import *
 
+# Dibuja texto en pantalla con sombra opcional
+def dibujar_texto(pantalla, texto, fuente, color, x, y, centro=False, sombra=False):
+    if sombra:
+        superficie_sombra = fuente.render(texto, True, NEGRO)
+        if centro:
+            rect_sombra = superficie_sombra.get_rect(center=(x + 2, y + 2))
+            pantalla.blit(superficie_sombra, rect_sombra)
+        else:
+            pantalla.blit(superficie_sombra, (x + 2, y + 2))
 
-# Dibuja texto en pantalla
-def dibujar_texto(pantalla, texto, fuente, color, x, y, centro=False):
-
-    # Renderizar el texto (convertirlo en imagen)
-    superficie_texto = fuente.render (texto, True, color)
-
-    # Si queremos centrar el texto
+    superficie_texto = fuente.render(texto, True, color)
     if centro:
         rect = superficie_texto.get_rect(center=(x, y))
         pantalla.blit(superficie_texto, rect)
     else:
-        # Si no, lo dibujamos desde la esquina superior izquierda
         pantalla.blit(superficie_texto, (x, y))
 
+def dibujar_panel(pantalla, x, y, ancho, alto, color=COLOR_PANEL, alpha=230, borde=True):
+    """Dibuja un panel semi-transparente con bordes redondeados."""
+    s = pygame.Surface((ancho, alto), pygame.SRCALPHA)
+    pygame.draw.rect(s, (*color, alpha), s.get_rect(), border_radius=15)
+    
+    if borde:
+        pygame.draw.rect(s, GRIS_CLARO, s.get_rect(), 2, border_radius=15)
+        
+    pantalla.blit(s, (x, y))
 
-# Dibuja un botón interactivo que cambia al pasar el mouse
+# Dibuja un botón interactivo moderno
 def dibujar_boton(pantalla, boton, texto, fuente, color_fondo, mouse_pos):
-
-    # Verificar si el mouse está sobre el botón
     hover = boton.collidepoint(mouse_pos)
-
+    
+    # Colores dinámicos
+    color_actual = list(color_fondo)
     if hover:
-        # Si el mouse está encima, invertir colores
-        pygame.draw.rect(pantalla, BLANCO, boton)
-        dibujar_texto(pantalla ,texto, fuente, NEGRO, boton.centerx, boton.centery, True)
+        # Hacer el color más brillante al pasar el mouse
+        color_actual = [min(255, c + 30) for c in color_actual]
+        # Efecto de elevación (sombra más grande)
+        sombra = pygame.Rect(boton.x + 2, boton.y + 4, boton.width, boton.height)
+        offset_y = -2
     else:
-        # Si no está encime, colores normales
-        pygame.draw.rect(pantalla, color_fondo, boton)
-        pygame.draw.rect(pantalla, BLANCO, boton, 3)   # Borde blanco de 3px
-        dibujar_texto(pantalla, texto, fuente, BLANCO, boton.centerx, boton.centery, True)
+        sombra = pygame.Rect(boton.x + 4, boton.y + 6, boton.width, boton.height)
+        offset_y = 0
+
+    # Dibujar sombra
+    pygame.draw.rect(pantalla, (0, 0, 0, 100), sombra, border_radius=12)
+    
+    # Botón principal
+    rect_dibujo = pygame.Rect(boton.x, boton.y + offset_y, boton.width, boton.height)
+    pygame.draw.rect(pantalla, color_actual, rect_dibujo, border_radius=12)
+    
+    # Borde brillante
+    pygame.draw.rect(pantalla, (255, 255, 255, 50), rect_dibujo, 2, border_radius=12)
+
+    # Texto con sombra sutil
+    dibujar_texto(pantalla, texto, fuente, BLANCO, rect_dibujo.centerx, rect_dibujo.centery, True, sombra=True)
 
     return hover
 
+# Dibuja una caja de texto moderna
+def dibujar_input_box(pantalla, rect, texto, activo, fuente):
+    # Fondo del input
+    color_fondo = (20, 20, 30)
+    pygame.draw.rect(pantalla, color_fondo, rect, border_radius=8)
+    
+    # Borde: Brillante si está activo
+    color_borde = COLOR_RESALTE if activo else GRIS
+    ancho_borde = 3 if activo else 1
+    pygame.draw.rect(pantalla, color_borde, rect, ancho_borde, border_radius=8)
+    
+    if activo:
+        # Glow externo sutil
+        s = pygame.Surface((rect.width + 10, rect.height + 10), pygame.SRCALPHA)
+        pygame.draw.rect(s, (*COLOR_RESALTE, 30), s.get_rect(), border_radius=12)
+        pantalla.blit(s, (rect.x - 5, rect.y - 5))
 
-# Dibuja una caja de texto donde el usuario puede escribir
-def dibujar_input_box(pantalla, rect, texto, activo, fuente, max_chars=None):
+    # Texto
+    texto_surface = fuente.render(texto, True, BLANCO)
+    pantalla.blit(texto_surface, (rect.x + 15, rect.y + 12))
 
-    # El color cambia si la caja está activa
-    color = AMARILLO if activo else GRIS_CLARO
-
-    # Dibujar fondo negro
-    pygame.draw.rect(pantalla, NEGRO, rect)
-
-    # Dibujar borde (amarillo si activo, gris si no)
-    pygame.draw.rect(pantalla, color, rect, 2)
-
-    # Renderizar el texto escrito
-    texto_surface =  fuente.render(texto, True, BLANCO)
-    pantalla.blit(texto_surface, (rect.x + 10, rect.y + 10))
-
-    # Mostrar cursor parpadeante si esta activo
+    # Cursor
     if activo and int(pygame.time.get_ticks() / 500) % 2:
-        cursor_x = rect.x + 10 + texto_surface.get_width() + 2
-        pygame.draw.line(pantalla, AMARILLO, (cursor_x, rect.y + 8), (cursor_x, rect.y + rect.height - 8), 2)
+        cursor_x = rect.x + 15 + texto_surface.get_width() + 2
+        pygame.draw.line(pantalla, COLOR_RESALTE, (cursor_x, rect.y + 10), (cursor_x, rect.y + rect.height - 10), 2)
 
-
-# Clase para un menú desplegable
+# Clase para un menú desplegable moderno
 class Dropdown:
     def __init__(self, x, y, w, h, font, main_color, hover_color, text_color, options, max_visible_options=5):
         self.rect = pygame.Rect(x, y, w, h)
@@ -73,75 +100,81 @@ class Dropdown:
         self.options = options
         self.selected_option = None
         self.is_open = False
-        self.active_option = -1
-        
-        # Scroll variables
-        self.max_visible_options = max_visible_options
         self.scroll_offset = 0
-        self.rect_menu = pygame.Rect(x, y + h, w, h * min(len(options), max_visible_options))
+        self.max_visible_options = max_visible_options
+        self.rect_menu = pygame.Rect(x, y + h + 5, w, h * min(len(options), max_visible_options))
 
     def dibujar(self, screen):
-        # Dibujar la caja principal
-        color = self.hover_color if self.rect.collidepoint(pygame.mouse.get_pos()) else self.main_color
-        pygame.draw.rect(screen, color, self.rect, 2)
-        pygame.draw.rect(screen, NEGRO, self.rect.inflate(-4, -4))
+        # Fondo y borde del campo principal
+        pygame.draw.rect(screen, (20, 20, 30), self.rect, border_radius=8)
         
-        # Texto seleccionado o placeholder
-        text = self.selected_option if self.selected_option else ""
-        msg = self.font.render(text, 1, self.text_color)
-        screen.blit(msg, msg.get_rect(center=self.rect.center))
-
-        # Dibujar opciones si está abierto
-        if self.is_open:
-            # Dibujar fondo del menú
-            pygame.draw.rect(screen, NEGRO, self.rect_menu)
-            pygame.draw.rect(screen, self.main_color, self.rect_menu, 2)
+        color_borde = COLOR_ACCENTO
+        if self.rect.collidepoint(pygame.mouse.get_pos()) or self.is_open:
+            color_borde = COLOR_RESALTE
             
-            # Calcular opciones visibles
+        pygame.draw.rect(screen, color_borde, self.rect, 2, border_radius=8)
+        
+        # Texto seleccionado
+        text = self.selected_option if self.selected_option else "Seleccionar Curso..."
+        color_texto = BLANCO if self.selected_option else GRIS
+        msg = self.font.render(text, 1, color_texto)
+        screen.blit(msg, (self.rect.x + 15, self.rect.centery - msg.get_height()//2))
+
+        # Dibujar lista desplegable
+        if self.is_open:
+            # Fondo del menú con sombra
+            screen_rect = screen.get_rect()
+            
+            # Dibujar un fondo oscuro detrás del menú para resaltarlo
+            s = pygame.Surface((self.rect_menu.width, self.rect_menu.height), pygame.SRCALPHA)
+            pygame.draw.rect(s, (26, 26, 46, 250), s.get_rect(), border_radius=8)
+            screen.blit(s, self.rect_menu.topleft)
+            
+            # Borde del menú
+            pygame.draw.rect(screen, COLOR_ACCENTO, self.rect_menu, 2, border_radius=8)
+            
             visible_options = self.options[self.scroll_offset : self.scroll_offset + self.max_visible_options]
             
             for i, option in enumerate(visible_options):
-                rect = pygame.Rect(self.rect.x, self.rect.y + (i + 1) * self.rect.height, self.rect.width, self.rect.height)
+                rect_opcion = pygame.Rect(self.rect_menu.x, self.rect_menu.y + i * self.rect.height, self.rect.width, self.rect.height)
                 
-                # Highlight si el mouse está encima
-                if rect.collidepoint(pygame.mouse.get_pos()):
-                    pygame.draw.rect(screen, self.hover_color, rect)
+                # Highlight
+                if rect_opcion.collidepoint(pygame.mouse.get_pos()):
+                    pygame.draw.rect(screen, COLOR_ACCENTO, rect_opcion, border_radius=4)
                 
-                # Dibujar texto
-                msg = self.font.render(option, 1, self.text_color)
-                screen.blit(msg, msg.get_rect(center=rect.center))
+                msg = self.font.render(option, 1, BLANCO)
+                screen.blit(msg, (rect_opcion.x + 15, rect_opcion.centery - msg.get_height()//2))
                 
-            # Dibujar barra de scroll si es necesario
+            # Scrollbar simple
             if len(self.options) > self.max_visible_options:
                 scroll_h = self.rect_menu.height * (self.max_visible_options / len(self.options))
                 scroll_y = self.rect_menu.y + (self.scroll_offset / len(self.options)) * self.rect_menu.height
-                scroll_rect = pygame.Rect(self.rect.right - 10, scroll_y, 8, scroll_h)
-                pygame.draw.rect(screen, GRIS_CLARO, scroll_rect)
+                pygame.draw.rect(screen, GRIS, (self.rect_menu.right - 8, scroll_y, 4, scroll_h), border_radius=2)
 
     def manejar_evento(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1: # Click izquierdo
+            if event.button == 1:
                 if self.rect.collidepoint(event.pos):
                     self.is_open = not self.is_open
+                    return True
                 elif self.is_open:
-                    # Verificar click en opciones visibles
                     visible_options = self.options[self.scroll_offset : self.scroll_offset + self.max_visible_options]
                     for i, option in enumerate(visible_options):
-                        rect = pygame.Rect(self.rect.x, self.rect.y + (i + 1) * self.rect.height, self.rect.width, self.rect.height)
+                        rect = pygame.Rect(self.rect_menu.x, self.rect_menu.y + i * self.rect.height, self.rect.width, self.rect.height)
                         if rect.collidepoint(event.pos):
                             self.selected_option = option
                             self.is_open = False
                             return True
                     
-                    # Si click fuera del menú, cerrar
                     if not self.rect_menu.collidepoint(event.pos):
                         self.is_open = False
                         
-            elif event.button == 4 and self.is_open: # Scroll arriba
+            elif event.button == 4 and self.is_open:
                 self.scroll_offset = max(0, self.scroll_offset - 1)
-            elif event.button == 5 and self.is_open: # Scroll abajo
+                return True
+            elif event.button == 5 and self.is_open:
                 self.scroll_offset = min(len(self.options) - self.max_visible_options, self.scroll_offset + 1)
-                
+                return True
         return False
 
     def obtener_valor(self):

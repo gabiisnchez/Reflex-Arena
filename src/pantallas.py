@@ -3,9 +3,10 @@
 # ============================================
 
 import pygame
+import math
 from src.config import *
 from src.circulo import Circulo
-from src.ui import dibujar_texto, dibujar_boton, dibujar_input_box, Dropdown
+from src.ui import dibujar_texto, dibujar_boton, dibujar_input_box, Dropdown, dibujar_panel
 
 # Pantalla donde el jugador introduce su nombre y curso
 class PantallaRegistro:
@@ -17,11 +18,17 @@ class PantallaRegistro:
         self.nombre = ""
         self.input_activo = "nombre"
 
-        self.input_nombre = pygame.Rect(ANCHO//2 - 200, 250, 400, 50)
-        self.boton_continuar = pygame.Rect(ANCHO//2 - 150, 470, 300, 50)
+        # Centrar panel
+        panel_w = 500
+        panel_h = 600
+        self.panel_x = ANCHO//2 - panel_w//2
+        self.panel_y = ALTO//2 - panel_h//2
+
+        self.input_nombre = pygame.Rect(self.panel_x + 50, self.panel_y + 150, 400, 50)
+        self.boton_continuar = pygame.Rect(ANCHO//2 - 150, self.panel_y + 480, 300, 65)
 
         opciones_curso = [
-            "1º Acondicionamiento Físico","2º Acondicionamiento Físico",
+            "1º Acondicionamiento Físico", "2º Acondicionamiento Físico",
             "1º TSEAS", "2º TSEAS",
             "1º TECO", "2º TECO",
             "1º DAM", "2º DAM",
@@ -41,32 +48,41 @@ class PantallaRegistro:
         ]
 
         self.dropdown_curso = Dropdown(
-            ANCHO//2 - 200, 350, 400, 50,
-            fuentes['mediana'],
-            GRIS_CLARO,
-            AMARILLO,
+            self.panel_x + 50, self.panel_y + 260, 400, 50,
+            fuentes['pequeña'],
+            COLOR_PANEL,
+            COLOR_ACCENTO,
             BLANCO,
-            opciones_curso
+            opciones_curso,
+            max_visible_options=3
         )
 
     # Muestra la pantalla de registro y gestiona la entrada de datos
     def mostrar(self):
+        clock = pygame.time.Clock()
         while True:
-            self.pantalla.fill(NEGRO)
+            self.pantalla.fill(COLOR_FONDO)
 
-            dibujar_texto(self.pantalla, "REGISTRO DE JUGADOR",
-                            self.fuentes['grande'], AMARILLO, ANCHO//2, 100, True)
+            # Dibujar un fondo sutil o patrón (opcional)
+            for i in range(0, ANCHO, 40):
+                pygame.draw.line(self.pantalla, (30, 30, 50), (i, 0), (i, ALTO), 1)
+            for i in range(0, ALTO, 40):
+                pygame.draw.line(self.pantalla, (30, 30, 50), (0, i), (ANCHO, i), 1)
 
-            dibujar_texto(self.pantalla, "Introduce tus datos para comenzar",
-                            self.fuentes['pequeña'], BLANCO, ANCHO//2, 170, True)
+            # Dibujar Panel
+            dibujar_panel(self.pantalla, self.panel_x, self.panel_y, 500, 600)
+
+            dibujar_texto(self.pantalla, "REGISTRO",
+                            self.fuentes['grande'], AMARILLO, ANCHO//2, self.panel_y + 40, True, sombra=True)
 
             dibujar_texto(self.pantalla, "Nombre:",
-                            self.fuentes['mediana'], BLANCO, ANCHO//2 - 200, 210)
+                            self.fuentes['mediana'], BLANCO, self.panel_x + 50, self.panel_y + 110)
+            
             dibujar_texto(self.pantalla, "Curso:",
-                            self.fuentes['mediana'], BLANCO, ANCHO//2 - 200, 310)
+                            self.fuentes['mediana'], BLANCO, self.panel_x + 50, self.panel_y + 220)
 
             dibujar_input_box(self.pantalla, self.input_nombre, self.nombre,
-                            self.input_activo == "nombre", self.fuentes['mediana'])
+                            self.input_activo == "nombre", self.fuentes['pequeña'])
 
             # Dibujar Dropdown
             self.dropdown_curso.dibujar(self.pantalla)
@@ -75,15 +91,16 @@ class PantallaRegistro:
 
             curso_seleccionado = self.dropdown_curso.obtener_valor()
             puede_continuar = len(self.nombre.strip()) > 0 and curso_seleccionado is not None
-            color_boton = VERDE if puede_continuar else GRIS
-
+            
+            # Botón Continuar
+            color_btn = COLOR_RESALTE if puede_continuar else GRIS
             if puede_continuar:
-                dibujar_boton(self.pantalla, self.boton_continuar, "CONTINUAR",
-                            self.fuentes['mediana'], color_boton, mouse_pos)
+                dibujar_boton(self.pantalla, self.boton_continuar, "INICIAR MISIÓN",
+                            self.fuentes['pequeña'], color_btn, mouse_pos)
             else:
-                pygame.draw.rect(self.pantalla, color_boton, self.boton_continuar)
-                pygame.draw.rect(self.pantalla, GRIS_CLARO, self.boton_continuar, 3)
-                dibujar_texto(self.pantalla, "CONTINUAR", self.fuentes['mediana'],
+                 # Dibujar botón deshabilitado
+                pygame.draw.rect(self.pantalla, list(color_btn) + [100], self.boton_continuar, border_radius=12)
+                dibujar_texto(self.pantalla, "INICIAR MISIÓN", self.fuentes['pequeña'],
                             GRIS_CLARO, self.boton_continuar.centerx,
                             self.boton_continuar.centery, True)
 
@@ -93,15 +110,17 @@ class PantallaRegistro:
 
                 # Manejar eventos del dropdown
                 if self.dropdown_curso.manejar_evento(evento):
-                    pass  # El dropdown manejó el evento
+                    pass
 
-                if evento.type == pygame.MOUSEBUTTONDOWN:
+                elif evento.type == pygame.MOUSEBUTTONDOWN:
                     if self.input_nombre.collidepoint(evento.pos):
                         self.input_activo = "nombre"
                     elif self.boton_continuar.collidepoint(evento.pos) and puede_continuar:
                         return {"nombre": self.nombre.strip(), "curso": curso_seleccionado}
+                    else:
+                        self.input_activo = None
 
-                if evento.type == pygame.KEYDOWN:
+                elif evento.type == pygame.KEYDOWN:
                     if evento.key == pygame.K_BACKSPACE:
                         if self.input_activo == "nombre":
                             self.nombre = self.nombre[:-1]
@@ -114,6 +133,7 @@ class PantallaRegistro:
                             self.nombre += evento.unicode
 
             pygame.display.flip()
+            clock.tick(60)
 
 
 # Pantalla de inicio con información del juego y botón para empezar
@@ -123,35 +143,51 @@ class PantallaInicio:
         """Constructor de la pantalla de inicio."""
         self.pantalla = pantalla
         self.fuentes = fuentes
+        self.start_ticks = pygame.time.get_ticks()
 
     def mostrar(self):
         """Muestra la pantalla de inicio."""
+        clock = pygame.time.Clock()
         while True:
-            self.pantalla.fill(NEGRO)
+            self.pantalla.fill(COLOR_FONDO)
+            
+            # Efecto de fondo (lineas moviéndose)
+            tiempo = pygame.time.get_ticks() / 1000
+            for i in range(10):
+                y = (tiempo * 50 + i * 60) % ALTO
+                pygame.draw.line(self.pantalla, (30, 30, 50), (0, y), (ANCHO, y), 1)
 
-            # Título con efecto de colores
-            for i, letra in enumerate("REFLEJOS RÁPIDOS"):
-                color = COLORES_TITULO[i % len(COLORES_TITULO)]
-                texto = self.fuentes['grande'].render(letra, True, color)
-                self.pantalla.blit(texto, (100 + i * 45, 80))
+            # Título con animación de pulso
+            scale = 1.0 + 0.05 * math.sin(tiempo * 2)
+            titulo_font = self.fuentes['grande']
+            
+            # Título principal
+            txt_reflejos = "REFLEJOS RÁPIDOS"
+            ancho_ref = titulo_font.size(txt_reflejos)[0]
+            espacio = 20
+            total_ancho = ancho_ref + espacio
+            
+            start_x = (ANCHO - total_ancho) // 2
+            
+            dibujar_texto(self.pantalla, txt_reflejos,
+                            titulo_font, CIAN, start_x, 260, False, sombra=True)
 
-            dibujar_texto(self.pantalla, "¡Haz clic en los círculos lo más rápido posible!",
-                            self.fuentes['pequeña'], BLANCO, ANCHO//2, 200, True)
-            dibujar_texto(self.pantalla, "Los círculos pequeños valen MÁS puntos",
-                            self.fuentes['pequeña'], AMARILLO, ANCHO//2, 240, True)
+            # Panel de instrucciones
+            dibujar_panel(self.pantalla, ANCHO//2 - 400, 340, 800, 180)
 
-            dibujar_texto(self.pantalla, f"⏱️  {TIEMPO_JUEGO} SEGUNDOS DE PURA ADRENALINA",
-                            self.fuentes['mediana'], ROJO, ANCHO//2, 300, True)
-            dibujar_texto(self.pantalla, f"🎯 {NUM_CIRCULOS} círculos simultáneos",
-                            self.fuentes['pequeña'], BLANCO, ANCHO//2, 350, True)
-            dibujar_texto(self.pantalla, "⚡ Velocidad aumentada",
-                            self.fuentes['pequeña'], BLANCO, ANCHO//2, 390, True)
+            dibujar_texto(self.pantalla, "OBJETIVO DE LA MISIÓN:",
+                            self.fuentes['mediana'], AMARILLO, ANCHO//2, 370, True)
 
-            boton_jugar = pygame.Rect(ANCHO//2 - 200, 460, 400, 70)
+            dibujar_texto(self.pantalla, "1. Destruye los círculos haciendo clic.",
+                            self.fuentes['pequeña'], BLANCO, ANCHO//2 - 350, 420, False)
+            dibujar_texto(self.pantalla, "2. Los objetivos pequeños otorgan MÁS puntos.",
+                            self.fuentes['pequeña'], ORANGE_RED if 'ORANGE_RED' in globals() else ROJO, ANCHO//2 - 350, 460, False)
+
+            boton_jugar = pygame.Rect(ANCHO//2 - 200, 560, 400, 80)
             mouse_pos = pygame.mouse.get_pos()
 
-            dibujar_boton(self.pantalla, boton_jugar, "¡EMPEZAR DESAFÍO!",
-                        self.fuentes['grande'], VERDE, mouse_pos)
+            dibujar_boton(self.pantalla, boton_jugar, "INICIAR SISTEMA",
+                        self.fuentes['mediana'], COLOR_RESALTE, mouse_pos)
 
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
@@ -161,6 +197,7 @@ class PantallaInicio:
                         return True
 
             pygame.display.flip()
+            clock.tick(60)
 
 
 # Pantalla del juego donde se juega
@@ -241,14 +278,17 @@ class PantallaJuego:
 
     # Dibuja el estado actual del juego
     def dibujar(self, tiempo_restante):
-        self.pantalla.fill(NEGRO)
+        self.pantalla.fill(COLOR_FONDO)
+        
+        # UI HUD (Heads Up Display)
+        dibujar_panel(self.pantalla, 0, 0, ANCHO, 120, color=COLOR_PANEL, alpha=240, borde=False)
+        pygame.draw.line(self.pantalla, COLOR_ACCENTO, (0, 120), (ANCHO, 120), 2)
 
-        pygame.draw.rect(self.pantalla, AZUL, (0, 0, ANCHO, 100))
-        pygame.draw.rect(self.pantalla, BLANCO, (0, 0, ANCHO, 100), 3)
+        # Puntuación
+        dibujar_texto(self.pantalla, f"PUNTOS", self.fuentes['pequeña'], GRIS_CLARO, 100, 30, True)
+        dibujar_texto(self.pantalla, f"{self.puntuacion}", self.fuentes['grande'], AMARILLO, 100, 80, True)
 
-        dibujar_texto(self.pantalla, f"PUNTOS: {self.puntuacion}",
-                        self.fuentes['mediana'], AMARILLO, 20, 30)
-
+        # Combo
         if self.racha > 1:
             color_racha = BLANCO
             if self.racha >= 10:
@@ -256,13 +296,28 @@ class PantallaJuego:
             elif self.racha >= 5:
                 color_racha = AMARILLO
 
-            dibujar_texto(self.pantalla, f"COMBO x{self.racha}",
-                            self.fuentes['mediana'], color_racha, 20, 70)
+            dibujar_texto(self.pantalla, f"COMBO", self.fuentes['pequeña'], GRIS_CLARO, ANCHO//2, 30, True)
+            dibujar_texto(self.pantalla, f"x{self.racha}", self.fuentes['grande'], color_racha, ANCHO//2, 80, True)
+            
+            # Barra de progreso del combo (visual)
+            bar_width = min(200, self.racha * 20)
+            pygame.draw.rect(self.pantalla, color_racha, (ANCHO//2 - bar_width//2, 110, bar_width, 4))
 
-        color_tiempo = VERDE if tiempo_restante > 10 else (AMARILLO if tiempo_restante > 5 else ROJO)
-        dibujar_texto(self.pantalla, f"TIEMPO: {int(tiempo_restante)}s",
-                        self.fuentes['mediana'], color_tiempo, ANCHO - 250, 30)
+        # Tiempo
+        color_tiempo = CIAN
+        if tiempo_restante <= 10:
+            color_tiempo = AMARILLO
+        if tiempo_restante <= 5:
+            color_tiempo = ROJO
+            # Parpadeo crítico
+            if int(tiempo_restante * 5) % 2 == 0:
+                color_tiempo = BLANCO
 
+        dibujar_texto(self.pantalla, f"TIEMPO", self.fuentes['pequeña'], GRIS_CLARO, ANCHO - 100, 30, True)
+        dibujar_texto(self.pantalla, f"{int(tiempo_restante)}", self.fuentes['grande'], color_tiempo, ANCHO - 100, 80, True)
+
+        # Area de juego
+        # Dibujo de círculos
         for circulo in self.circulos:
             circulo.dibujar(self.pantalla, self.fuentes['pequeña'])
 
@@ -295,63 +350,75 @@ class PantallaFinal:
 
     # Muestra la pantalla final con resultados
     def mostrar(self):
+        clock = pygame.time.Clock()
         while True:
-            self.pantalla.fill(NEGRO)
+            self.pantalla.fill(COLOR_FONDO)
 
-            dibujar_texto(self.pantalla, "¡JUEGO TERMINADO!",
-                            self.fuentes['grande'], AMARILLO, ANCHO//2, 40, True)
+            dibujar_texto(self.pantalla, "MISIÓN FINALIZADA",
+                            self.fuentes['grande'], AMARILLO, ANCHO//2, 40, True, sombra=True)
 
-            dibujar_texto(self.pantalla, f"{self.jugador['nombre']} - {self.jugador['curso']}",
-                            self.fuentes['pequeña'], BLANCO, ANCHO//2, 100, True)
+            # Panel de Resultado Personal
+            dibujar_panel(self.pantalla, 50, 90, ANCHO - 100, 160)
+            
+            # Nombre y Curso centrados arriba
+            dibujar_texto(self.pantalla, f"AGENTE: {self.jugador['nombre']}",
+                            self.fuentes['mediana'], BLANCO, ANCHO//2, 115, True)
+            dibujar_texto(self.pantalla, f"UNIDAD: {self.jugador['curso']}",
+                            self.fuentes['pequeña'], GRIS_CLARO, ANCHO//2, 145, True)
+            
+            # Puntuación y Posición centrados debajo
+            # Puntuación a la izquierda del centro
+            dibujar_texto(self.pantalla, "PUNTUACIÓN", self.fuentes['pequeña'], CIAN, ANCHO//2 - 120, 180, True)
+            dibujar_texto(self.pantalla, str(self.puntuacion), self.fuentes['grande'], VERDE, ANCHO//2 - 120, 215, True)
+            
+            # Posición a la derecha del centro
+            dibujar_texto(self.pantalla, "POSICIÓN", self.fuentes['pequeña'], CIAN, ANCHO//2 + 120, 180, True)
+            dibujar_texto(self.pantalla, f"#{self.posicion}", self.fuentes['grande'], MAGENTA, ANCHO//2 + 120, 215, True)
 
-            dibujar_texto(self.pantalla, f"Puntuación: {self.puntuacion}",
-                            self.fuentes['mediana'], VERDE, ANCHO//2, 140, True)
-
-            dibujar_texto(self.pantalla, f"Posición: #{self.posicion} de {self.sistema.obtener_total_jugadores()}",
-                            self.fuentes['mediana'], ROSA, ANCHO//2, 180, True)
-
+            # Mensaje de estado
             if self.posicion == 1:
-                mensaje = "🏆 ¡NUEVO RÉCORD! ¡Eres el número 1! 🏆"
-            elif self.posicion <= 3:
-                mensaje = "🥇 ¡TOP 3! ¡Increíble! 🥇"
+                mensaje = "🏆 ¡NUEVO RÉCORD ABSOLUTO! 🏆"
+                color_msg = AMARILLO
             elif self.posicion <= 10:
-                mensaje = "⭐ ¡TOP 10! ¡Muy bien! ⭐"
-            elif self.puntuacion > 80:
-                mensaje = "💪 ¡Excelente puntuación! 💪"
-            elif self.puntuacion > 50:
-                mensaje = "👍 ¡Buen trabajo! ¡Sigue así! 👍"
+                mensaje = "⭐ ESTÁS EN EL TOP 10 ⭐"
+                color_msg = CIAN
             else:
-                mensaje = "🎯 ¡Buen intento! ¡Puedes mejorar! 🎯"
+                mensaje = "BUEN INTENTO. SIGUE ENTRENANDO."
+                color_msg = GRIS_CLARO
 
-            dibujar_texto(self.pantalla, mensaje, self.fuentes['pequeña'],
-                            AMARILLO, ANCHO//2, 220, True)
+            dibujar_texto(self.pantalla, mensaje, self.fuentes['mediana'], color_msg, ANCHO//2, 280, True)
 
-            dibujar_texto(self.pantalla, "═══ TOP 10 ═══",
-                            self.fuentes['mediana'], NARANJA, ANCHO//2, 260, True)
-
-            y_pos = 300
+            # Tabla TOP 10
+            dibujar_panel(self.pantalla, 100, 320, ANCHO - 200, 450)
+            dibujar_texto(self.pantalla, "CLASIFICACIÓN GLOBAL", self.fuentes['mediana'], COLOR_ACCENTO, ANCHO//2, 360, True)
+            
+            y_pos = 410
             for i, record in enumerate(self.top10, 1):
-                color = AMARILLO if i <= 3 else BLANCO
+                color = BLANCO
+                if i == 1: color = AMARILLO
+                elif i == 2: color = GRIS_CLARO
+                elif i == 3: color = ORANGE_RED if 'ORANGE_RED' in globals() else NARANJA
 
-                medalla = ""
-                if i == 1:
-                    medalla = "🥇"
-                elif i == 2:
-                    medalla = "🥈"
-                elif i == 3:
-                    medalla = "🥉"
+                bg_color = (255, 255, 255, 20) if i % 2 == 0 else (0, 0, 0, 0)
+                if bg_color[3] > 0:
+                     # Ajustar el ancho de la fila de fondo
+                     s = pygame.Surface((ANCHO - 240, 30), pygame.SRCALPHA)
+                     pygame.draw.rect(s, bg_color, s.get_rect(), border_radius=5)
+                     self.pantalla.blit(s, (120, y_pos - 5))
 
-                texto = f"{medalla}{i}. {record['nombre'][:12]} ({record['curso']}) - {record['puntuacion']} pts"
-                dibujar_texto(self.pantalla, texto, self.fuentes['pequeña'],
-                            color, ANCHO//2, y_pos, True)
-                y_pos += 30
+                dibujar_texto(self.pantalla, f"#{i}", self.fuentes['pequeña'], color, 140, y_pos)
+                # Mostrar más caracteres del nombre
+                dibujar_texto(self.pantalla, f"{record['nombre'][:25]}", self.fuentes['pequeña'], color, 220, y_pos)
+                dibujar_texto(self.pantalla, f"{record['puntuacion']}", self.fuentes['pequeña'], VERDE, ANCHO - 250, y_pos)
 
-            boton_reintentar = pygame.Rect(50, 540, 300, 45)
-            boton_nuevo_juego = pygame.Rect(450, 540, 300, 45)
+                
+                y_pos += 35
 
+            boton_reintentar = pygame.Rect(162, 800, 340, 60)
+            boton_nuevo_juego = pygame.Rect(522, 800, 340, 60)
             mouse_pos = pygame.mouse.get_pos()
 
-            dibujar_boton(self.pantalla, boton_reintentar, "JUGAR DE NUEVO",
+            dibujar_boton(self.pantalla, boton_reintentar, "REINTENTAR MISIÓN",
                             self.fuentes['pequeña'], VERDE, mouse_pos)
             dibujar_boton(self.pantalla, boton_nuevo_juego, "NUEVO JUEGO",
                             self.fuentes['pequeña'], AZUL, mouse_pos)
@@ -366,3 +433,5 @@ class PantallaFinal:
                         return "new_user"
 
             pygame.display.flip()
+            clock.tick(60)
+
