@@ -4,7 +4,7 @@
 
 # Configuración de la ventana del juego
 ANCHO = 1024                    # Ancho de la ventana en píxeles
-ALTO = 900                      # Alto de la ventana en píxeles
+ALTO = 840                      # Alto de la ventana en píxeles
 FPS = 60                        # Fotogramas por segundo
 
 # Colores en formato RGB

@@ -389,10 +389,9 @@ class PantallaFinal:
             dibujar_texto(self.pantalla, mensaje, self.fuentes['mediana'], color_msg, ANCHO//2, 280, True)
 
             # Tabla TOP 10
-            dibujar_panel(self.pantalla, 100, 320, ANCHO - 200, 450)
-            dibujar_texto(self.pantalla, "CLASIFICACIÓN GLOBAL", self.fuentes['mediana'], COLOR_ACCENTO, ANCHO//2, 360, True)
+            dibujar_panel(self.pantalla, 100, 320, ANCHO - 200, 400)
             
-            y_pos = 410
+            y_pos = 350
             for i, record in enumerate(self.top10, 1):
                 color = BLANCO
                 if i == 1: color = AMARILLO
@@ -414,8 +413,8 @@ class PantallaFinal:
                 
                 y_pos += 35
 
-            boton_reintentar = pygame.Rect(162, 800, 340, 60)
-            boton_nuevo_juego = pygame.Rect(522, 800, 340, 60)
+            boton_reintentar = pygame.Rect(162, 740, 340, 60)
+            boton_nuevo_juego = pygame.Rect(522, 740, 340, 60)
             mouse_pos = pygame.mouse.get_pos()
 
             dibujar_boton(self.pantalla, boton_reintentar, "REINTENTAR MISIÓN",
