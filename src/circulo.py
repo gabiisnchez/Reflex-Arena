@@ -29,8 +29,8 @@ class Circulo:
         # Posición X aleatoria (pero sin salirse de la pantalla)
         self.x = random.randint(self.radio, ancho - self.radio)
 
-        # Posición Y aleatorio (empezando desde y=120 para dejar espacio arriba para el HUD)
-        self.y = random.randint(120 + self.radio, alto - self.radio)
+        # Posición Y aleatorio (empezando desde y=80 para dejar espacio arriba para el HUD)
+        self.y = random.randint(80 + self.radio, alto - self.radio)
 
         # Determinar si es un círculo dorado
         self.es_dorado = random.random() < PROBABILIDAD_ORO
@@ -84,8 +84,8 @@ class Circulo:
         if self.x - self.radio <= 0 or self.x + self.radio >= self.ancho:
             self.velocidad_x *= -1 # Invertir dirección X
 
-        # Rebotar en bordes verticales (Límite superior = 120 para el HUD)
-        if self.y - self.radio <= 120 or self.y + self.radio >= self.alto:
+        # Rebotar en bordes verticales (Límite superior = 80 para el HUD)
+        if self.y - self.radio <= 80 or self.y + self.radio >= self.alto:
             self.velocidad_y *= -1 # Invertir dirección Y
 
 

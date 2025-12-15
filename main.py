@@ -44,10 +44,10 @@ def main():
         return pygame.font.SysFont("arial", size)
 
     fuentes = {
-        'grande': pygame.font.Font(None, 74),
-        'mediana': pygame.font.Font(None, 48),
-        'pequeña': pygame.font.Font(None, 36),
-        'emoji_pequeña': cargar_fuente(36)
+        'grande': pygame.font.Font(None, 48),
+        'mediana': pygame.font.Font(None, 32),
+        'pequeña': pygame.font.Font(None, 24),
+        'emoji_pequeña': cargar_fuente(24)
     }
     
     # Reloj para controlar FPS
