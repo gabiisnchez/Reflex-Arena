@@ -378,10 +378,10 @@ class PantallaFinal:
 
             # Mensaje de estado
             if self.posicion == 1:
-                mensaje = "🏆 ¡NUEVO RÉCORD ABSOLUTO! 🏆"
+                mensaje = "¡NUEVO RÉCORD ABSOLUTO!"
                 color_msg = AMARILLO
             elif self.posicion <= 10:
-                mensaje = "⭐ ESTÁS EN EL TOP 10 ⭐"
+                mensaje = "ESTÁS EN EL TOP 10"
                 color_msg = CIAN
             else:
                 mensaje = "BUEN INTENTO. SIGUE ENTRENANDO."
