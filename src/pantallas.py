@@ -408,14 +408,22 @@ class PantallaFinal:
 
                 dibujar_texto(self.pantalla, f"#{i}", self.fuentes['pequeña'], color, 120, y_pos)
                 # Mostrar más caracteres del nombre
-                dibujar_texto(self.pantalla, f"{record['nombre'][:25]}", self.fuentes['pequeña'], color, 200, y_pos)
+                dibujar_texto(self.pantalla, f"{record['nombre'][:20]}", self.fuentes['pequeña'], color, 200, y_pos)
+                if 'curso' in record:
+                    dibujar_texto(self.pantalla, f"{record['curso']}", self.fuentes['pequeña'], color, 550, y_pos)
                 dibujar_texto(self.pantalla, f"{record['puntuacion']}", self.fuentes['pequeña'], VERDE, ANCHO - 200, y_pos)
 
                 
                 y_pos += 25
 
-            boton_reintentar = pygame.Rect(100, 530, 280, 50)
-            boton_nuevo_juego = pygame.Rect(420, 530, 280, 50)
+            # Centrar botones
+            ancho_boton = 280
+            gap = 40
+            total_botones = (ancho_boton * 2) + gap
+            start_x_botones = (ANCHO - total_botones) // 2
+            
+            boton_reintentar = pygame.Rect(start_x_botones, 530, ancho_boton, 50)
+            boton_nuevo_juego = pygame.Rect(start_x_botones + ancho_boton + gap, 530, ancho_boton, 50)
             mouse_pos = pygame.mouse.get_pos()
 
             dibujar_boton(self.pantalla, boton_reintentar, "REINTENTAR MISIÓN",
