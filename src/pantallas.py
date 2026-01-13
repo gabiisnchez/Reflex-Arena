@@ -30,7 +30,7 @@ class PantallaRegistro:
         opciones_curso = [
             "1º Acondicionamiento Físico", "2º Acondicionamiento Físico",
             "1º TSEAS", "2º TSEAS",
-            "1º TECO", "2º TECO",
+            "1º TEGUI", "2º TEGUI",
             "1º DAM", "2º DAM",
             "1º DAW", "2º DAW",
             "1º SMR", "2º SMR",
@@ -44,7 +44,8 @@ class PantallaRegistro:
             "1º Prótesis", "2º Prótesis",
             "1º Atención a personas", "2º Atención a personas",
             "1º Infantil", "2º Infantil",
-            "1º Integración Social", "2º Integración Social"
+            "1º Integración Social", "2º Integración Social",
+            "Profesor"
         ]
 
         self.dropdown_curso = Dropdown(
